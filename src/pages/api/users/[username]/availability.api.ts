@@ -30,9 +30,9 @@ export default async function handle(
     return res.status(400).json({ message: 'User do not exist.' })
   }
 
-  const referenteDate = dayjs(String(date)) // pega parametro date e transforma em data usando do dayjs
+  const referenceDate = dayjs(String(date)) // pega parametro date e transforma em data usando do dayjs
 
-  const isPastDate = referenteDate.endOf('day').isBefore(new Date()) // verifica se a data informada e antes que a data de hoje
+  const isPastDate = referenceDate.endOf('day').isBefore(new Date()) // verifica se a data informada e antes que a data de hoje
 
   if (isPastDate) {
     return res.json({
@@ -45,7 +45,7 @@ export default async function handle(
     // pega no banco os horarios disponiveis do usuario
     where: {
       user_id: user.id,
-      week_day: referenteDate.get('day'),
+      week_day: referenceDate.get('day'),
     },
   })
 
@@ -76,8 +76,8 @@ export default async function handle(
     where: {
       user_id: user.id,
       date: {
-        gte: referenteDate.set('hour', startHour).toDate(),
-        lte: referenteDate.set('hour', endHour).toDate(),
+        gte: referenceDate.set('hour', startHour).toDate(),
+        lte: referenceDate.set('hour', endHour).toDate(),
       },
     },
   })

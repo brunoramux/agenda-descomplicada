@@ -6,17 +6,17 @@ import {
   TimePickerItem,
   TimePickerList,
 } from './styles'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import dayjs from 'dayjs'
 import { api } from '@/src/lib/axios'
 import { useRouter } from 'next/router'
+import { useQuery } from '@tanstack/react-query'
 interface Avalaibility {
   possibleTimes: number[]
   availableTimes: number[]
 }
 export function CalendarStep() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null) // esse estado controla qual o dia selecionado. A funcao setSelectedDate e passado como props para o componente Calendar, que vai acionar a mudanca de dias
-  const [availability, setAvailability] = useState<Avalaibility | null>(null)
 
   const router = useRouter()
   const username = String(router.query.username)
@@ -28,21 +28,24 @@ export function CalendarStep() {
     ? dayjs(selectedDate).format('DD[ de ]MMMM')
     : null
 
-  useEffect(() => {
-    if (!selectedDate) {
-      return
-    }
+  const selectedDateWhitoutTime = selectedDate
+    ? dayjs(selectedDate).format('YYYY-MM-DD')
+    : null
 
-    api
-      .get(`/users/${username}/availability`, {
+  const { data: availability } = useQuery<Avalaibility>( // hook do react para chamadas de api. Substitui o useEffect. Possui camada de cache, tornando a aplicacao mais rapida
+    ['availability', selectedDateWhitoutTime],
+    async () => {
+      const response = await api.get(`/users/${username}/availability`, {
         params: {
-          date: dayjs(selectedDate).format('YYYY-MM-DD'),
+          date: selectedDateWhitoutTime,
         },
       })
-      .then((response) => {
-        setAvailability(response.data)
-      })
-  }, [selectedDate, username])
+      return response.data
+    },
+    {
+      enabled: !!selectedDate,
+    },
+  )
 
   return (
     <Container isTimePickerOpen={isDateSelected}>
