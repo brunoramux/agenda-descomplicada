@@ -1,6 +1,8 @@
 import { prisma } from '@/src/lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from 'next-auth'
 import { z } from 'zod'
+import { buildNextAuthOptions } from '../../auth/[...nextauth].api'
 
 const timeIntervalsBodySchema = z.object({
   intervals: z.array(
@@ -20,25 +22,22 @@ export default async function handle(
     return res.status(405).end()
   }
 
-  const username = String(req.query.username) // pega parametro
+  const session = await getServerSession(
+    // rota autenticada
+    req,
+    res,
+    buildNextAuthOptions(req, res),
+  )
 
-  const user = await prisma.user.findUnique({
-    // busca usuario no banco
-    where: {
-      username,
-    },
-  })
-
-  if (!user) {
-    // verifica se usuario existente
-    return res.status(400).json({ message: 'User do not exist.' })
+  if (!session) {
+    return res.status(401).end()
   }
 
   const { intervals } = timeIntervalsBodySchema.parse(req.body)
 
   await prisma.userTimeInterval.deleteMany({
     where: {
-      user_id: user.id,
+      user_id: session.user?.id,
     },
   })
 
@@ -49,7 +48,7 @@ export default async function handle(
           week_day: interval.weekDay,
           time_start_in_minutes: interval.startTimeInMinutes,
           time_end_in_minutes: interval.endTimeInMinutes,
-          user_id: user.id,
+          user_id: session.user?.id,
         },
       })
     }),

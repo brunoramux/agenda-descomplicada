@@ -23,7 +23,7 @@ import { convertTimeStringToMinutes } from '@/src/utils/convert-time-string-to-m
 import { api } from '@/src/lib/axios'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { prisma } from '@/src/lib/prisma'
-import { Prisma, User, UserTimeInterval } from '@prisma/client'
+import { User, UserTimeInterval } from '@prisma/client'
 import { useRouter } from 'next/router'
 
 const timeIntervalsFormSchema = z.object({
