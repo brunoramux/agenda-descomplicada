@@ -31,6 +31,7 @@ interface CalendarProps {
 
 interface BlockedDates {
   blockedWeekDays: number[]
+  blockedDates: number[]
 }
 
 export function Calendar({ onDateSelected, selectedDate }: CalendarProps) {
@@ -63,7 +64,7 @@ export function Calendar({ onDateSelected, selectedDate }: CalendarProps) {
       const response = await api.get(`/users/${username}/blocked-dates`, {
         params: {
           year: currentDate.get('year'),
-          month: currentDate.get('month'),
+          month: currentDate.get('month') + 1,
         },
       })
       return response.data
@@ -119,8 +120,9 @@ export function Calendar({ onDateSelected, selectedDate }: CalendarProps) {
         return {
           date,
           disabled:
-            date.endOf('day').isBefore(new Date()) ||
-            blockedDates.blockedWeekDays.includes(date.get('day')),
+            date.endOf('day').isBefore(new Date()) || // bloqueia dias anteriores ao dia atual
+            blockedDates.blockedWeekDays.includes(date.get('day')) ||
+            blockedDates.blockedDates.includes(date.get('date')), // desabilita os dias bloqueados, retornados pela consulta a API
         }
       }),
       ...nextMonthFillArray.map((date) => {
@@ -185,7 +187,7 @@ export function Calendar({ onDateSelected, selectedDate }: CalendarProps) {
                           () =>
                             onDateSelected(
                               date.toDate(),
-                            ) /* aciona a tela de selecao de horario */
+                            ) /* aciona a tela de selecao de horario atraves da funcao passada via parametro */
                         }
                         disabled={disabled}
                       >

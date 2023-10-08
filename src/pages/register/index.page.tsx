@@ -25,14 +25,12 @@ import {
 const registerFormSchema = z.object({
   username: z
     .string()
-    .min(3, { message: 'O usuario precisa ter pelo menos 3 letras.' })
+    .min(3, { message: 'Usuário inválido!' })
     .regex(/^([a-z\\-]+)$/i, {
-      message: 'O usuário pode ter apenas letras e hifens.',
+      message: 'Usuário inválido. Utilize apenas letras e/ou hifen!',
     })
     .transform((username) => username.toLowerCase()),
-  name: z
-    .string()
-    .min(3, { message: 'O nome precisa ter pelo menos 3 letras.' }),
+  name: z.string().min(3, { message: 'Nome Inválido!' }),
 })
 
 type RegisterFormData = z.infer<typeof registerFormSchema>
@@ -61,7 +59,7 @@ export default function Register() {
 
   useEffect(() => {
     if (router.query.username) {
-      setValue('username', String(router.query.username))
+      setValue('username', String(router.query.username)) // funcao para colocar usuario que veio via parametro dentro do form
     }
   }, [router.query?.username, setValue])
 
@@ -84,7 +82,7 @@ export default function Register() {
   return (
     <Container>
       <Header>
-        <Heading as="strong">Bem vindo ao Ignite Call</Heading>
+        <Heading as="strong">Bem vindo ao App Agenda descomplicada</Heading>
         <Text>
           Precisamos de algumas informações para criar seu perfil! Ah, vocé pode
           editar essas informações depois.
@@ -95,7 +93,7 @@ export default function Register() {
         <label>
           <Text size="sm">Nome de usuário</Text>
           <TextInput
-            prefix="ignite.com/"
+            prefix="agendadescomplicada.com/"
             placeholder="seu-usuario"
             {...register('username')}
           />

@@ -24,10 +24,10 @@ export default function ConnectCallendar() {
   return (
     <Container>
       <Header>
-        <Heading as="strong">Bem vindo ao Ignite Call</Heading>
+        <Heading as="strong">Bem vindo ao App Agenda descomplicada</Heading>
         <Text size="sm">
-          Conecte o seu calendário para verificar automaticamente as horas
-          ocupadas e os novos eventos a medida em que são agendados.
+          Conecte o seu calendário Google para verificar automaticamente as
+          horas ocupadas e os novos eventos a medida em que são agendados.
         </Text>
         <MultiStep size={4} currentStep={2} />
       </Header>

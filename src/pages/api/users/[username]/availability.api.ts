@@ -15,7 +15,7 @@ export default async function handle(
 
   if (!date) {
     // verifica se a data foi passada via parametro
-    return res.status(400).json({ message: 'Date not provided.' })
+    return res.status(400).json({ message: 'Data não informada.' })
   }
 
   const user = await prisma.user.findUnique({
@@ -27,7 +27,7 @@ export default async function handle(
 
   if (!user) {
     // verifica se usuario existente
-    return res.status(400).json({ message: 'User do not exist.' })
+    return res.status(400).json({ message: 'Uuário não encontrado!.' })
   }
 
   const referenceDate = dayjs(String(date)) // pega parametro date e transforma em data usando do dayjs
@@ -68,6 +68,9 @@ export default async function handle(
     },
   )
 
+  const start = startHour - 3
+  const end = endHour - 3
+
   const blockedTimes = await prisma.scheduling.findMany({
     // verifica se ha horarios ja marcados
     select: {
@@ -76,17 +79,21 @@ export default async function handle(
     where: {
       user_id: user.id,
       date: {
-        gte: referenceDate.set('hour', startHour).toDate(),
-        lte: referenceDate.set('hour', endHour).toDate(),
+        gte: referenceDate.set('hour', start).toDate(),
+        lte: referenceDate.set('hour', end).toDate(),
       },
     },
   })
 
   const availableTimes = possibleTimes.filter((time) => {
     // retornar apenas horarios que nao estiverem bloqueados
-    return !blockedTimes.some(
-      (blockedTime) => blockedTime.date.getHours() === time,
+    const isTimeBlocked = blockedTimes.some(
+      (blockedTime) => blockedTime.date.getHours() + 3 === time,
     )
+
+    const isTimePast = referenceDate.set('hour', time).isBefore(new Date())
+
+    return !isTimeBlocked && !isTimePast
   })
 
   return res.json({

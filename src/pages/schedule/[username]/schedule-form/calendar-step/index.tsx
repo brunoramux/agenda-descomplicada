@@ -16,7 +16,7 @@ interface Avalaibility {
   availableTimes: number[]
 }
 export function CalendarStep() {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null) // esse estado controla qual o dia selecionado. A funcao setSelectedDate e passado como props para o componente Calendar, que vai acionar a mudanca de dias
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null) // esse estado controla qual o dia selecionado. A funcao setSelectedDate e passada como props para o componente Calendar, que vai acionar a mudanca de dias
 
   const router = useRouter()
   const username = String(router.query.username)
@@ -28,7 +28,7 @@ export function CalendarStep() {
     ? dayjs(selectedDate).format('DD[ de ]MMMM')
     : null
 
-  const selectedDateWhitoutTime = selectedDate
+  const selectedDateWhitoutTime = selectedDate // formatando data para passar nos parametros da URL da API
     ? dayjs(selectedDate).format('YYYY-MM-DD')
     : null
 
@@ -58,12 +58,14 @@ export function CalendarStep() {
           </TimePickerHeader>
           <TimePickerList>
             {availability?.possibleTimes.map((hour) => {
+              // percorre todos os possiveis horarios
               return (
                 <TimePickerItem
                   key={hour}
-                  disabled={!availability.availableTimes.includes(hour)}
+                  disabled={!availability.availableTimes.includes(hour)} // caso horario nao disponivel, deixa o botao desabilitado
                 >
-                  {String(hour).padStart(2, '0')}:00h
+                  {/* formatando hora para mostrar na tela */}
+                  {String(hour).padStart(2, '0')}:00h{' '}
                 </TimePickerItem>
               )
             })}
