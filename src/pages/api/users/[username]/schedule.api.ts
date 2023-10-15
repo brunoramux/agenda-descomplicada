@@ -1,10 +1,14 @@
 import { getGoogleOAuthToken } from '@/src/lib/google'
 import { prisma } from '@/src/lib/prisma'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import { google } from 'googleapis'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
+dayjs.extend(utc)
+dayjs.extend(timezone)
 export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -38,6 +42,7 @@ export default async function handle(
   ) // pega body da requisicao com dados para gravar o Scheduling
 
   const schedulingDate = dayjs(date).startOf('hour')
+  console.log(schedulingDate)
 
   if (schedulingDate.isBefore(new Date())) {
     // verifica novamente se hora nao passou
@@ -68,6 +73,8 @@ export default async function handle(
       user_id: user.id,
     },
   })
+  console.log(schedulingDate)
+  console.log(schedulingDate.toDate())
 
   const calendar = google.calendar({
     version: 'v3',

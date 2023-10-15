@@ -68,36 +68,36 @@ export default async function handle(
     },
   )
 
-  const start = startHour
-  const end = endHour
-
   const blockedTimes = await prisma.scheduling.findMany({
-    // verifica se ha horarios ja marcados
     select: {
       date: true,
     },
     where: {
       user_id: user.id,
       date: {
-        gte: referenceDate.set('hour', start).toDate(),
-        lte: referenceDate.set('hour', end).toDate(),
+        gte: referenceDate.startOf('day').toDate(),
+        lte: referenceDate.endOf('day').toDate(),
       },
     },
   })
-
-  const availableTimes = possibleTimes.filter((time) => {
-    // retornar apenas horarios que nao estiverem bloqueados
-    const isTimeBlocked = blockedTimes.some(
-      (blockedTime) => blockedTime.date.getHours() === time,
-    )
-
-    const isTimePast = referenceDate.set('hour', time).isBefore(new Date())
-
-    return !isTimeBlocked && !isTimePast
+  console.log(referenceDate.startOf('day').toDate())
+  const unavailableTimes = blockedTimes.map((schedules) => {
+    return schedules.date
   })
+
+  // const availableTimes = possibleTimes.filter((time) => {
+  //   // retornar apenas horarios que nao estiverem bloqueados
+  //   const isTimeBlocked = blockedTimes.some(
+  //     (blockedTime) => blockedTime.date.getHours() === time,
+  //   )
+
+  //   const isTimePast = referenceDate.set('hour', time).isBefore(new Date())
+
+  //   return !isTimeBlocked && !isTimePast
+  // })
 
   return res.json({
     possibleTimes,
-    availableTimes,
+    unavailableTimes,
   })
 }

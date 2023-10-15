@@ -13,7 +13,7 @@ import { useRouter } from 'next/router'
 import { useQuery } from '@tanstack/react-query'
 interface Avalaibility {
   possibleTimes: number[]
-  availableTimes: number[]
+  unavailableTimes: number[]
 }
 
 interface CalendarStepProps {
@@ -51,14 +51,20 @@ export function CalendarStep({ onSelectDateTime }: CalendarStepProps) {
       enabled: !!selectedDate,
     },
   )
+  const unavailableTimes = availability?.unavailableTimes.map(
+    (availableTime) => {
+      return dayjs(availableTime).get('hour') + 3
+    },
+  )
 
   function handleSelectTime(hour: number) {
     const dateTime = dayjs(selectedDate)
       .set('hour', hour)
       .startOf('hour')
       .toDate()
-    dateTime.setHours(dateTime.getHours() - 3)
+    dateTime.setHours(dateTime.getHours())
     onSelectDateTime(dateTime)
+    console.log(dateTime)
   }
 
   return (
@@ -77,7 +83,7 @@ export function CalendarStep({ onSelectDateTime }: CalendarStepProps) {
                 <TimePickerItem
                   key={hour}
                   onClick={() => handleSelectTime(hour)}
-                  disabled={!availability.availableTimes.includes(hour)} // caso horario nao disponivel, deixa o botao desabilitado
+                  disabled={!!unavailableTimes?.includes(hour)} // caso horario nao disponivel, deixa o botao desabilitado
                 >
                   {/* formatando hora para mostrar na tela */}
                   {String(hour).padStart(2, '0')}:00h{' '}

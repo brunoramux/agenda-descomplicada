@@ -4,7 +4,7 @@ import { CalendarBlank, Clock } from 'phosphor-react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { api } from '@/src/lib/axios'
 import { useRouter } from 'next/router'
 
@@ -36,6 +36,8 @@ export function ConfirmStep({
 
   const router = useRouter()
   const username = String(router.query.username)
+  const novaHora = schedulingDate.getHours()
+  const novaData = dayjs(schedulingDate).set('hour', novaHora - 3)
 
   async function handleConfirmScheduling(data: ConfirmFormData) {
     const { name, email, observations } = data
@@ -43,7 +45,7 @@ export function ConfirmStep({
       name,
       email,
       observations,
-      date: schedulingDate,
+      date: novaData,
     })
 
     onCancelForm()
