@@ -68,8 +68,8 @@ export default async function handle(
     },
   )
 
-  const start = startHour - 3
-  const end = endHour - 3
+  const start = startHour
+  const end = endHour
 
   const blockedTimes = await prisma.scheduling.findMany({
     // verifica se ha horarios ja marcados
@@ -88,7 +88,7 @@ export default async function handle(
   const availableTimes = possibleTimes.filter((time) => {
     // retornar apenas horarios que nao estiverem bloqueados
     const isTimeBlocked = blockedTimes.some(
-      (blockedTime) => blockedTime.date.getHours() + 3 === time,
+      (blockedTime) => blockedTime.date.getHours() === time,
     )
 
     const isTimePast = referenceDate.set('hour', time).isBefore(new Date())
