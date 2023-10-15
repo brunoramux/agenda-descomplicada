@@ -141,14 +141,12 @@ export default function TimeIntervals() {
                 </IntervalDay>
                 <IntervalInputs>
                   <TextInput
-                    size="sm"
                     type="time"
                     step={60}
                     disabled={intervals[index].enabled === false}
                     {...register(`intervals.${index}.startTime`)}
                   />
                   <TextInput
-                    size="sm"
                     type="time"
                     step={60}
                     disabled={intervals[index].enabled === false} // habilita e desabilita conforme estado do checkbox
