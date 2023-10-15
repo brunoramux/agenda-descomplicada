@@ -1,6 +1,6 @@
 import { Button, Heading, MultiStep, Text } from '@brunoramos-ui/react'
 import { Container, Header } from '../styles'
-import React, { useEffect } from 'react'
+import React from 'react'
 // import { api } from '@/src/lib/axios'
 import { ArrowRight, Check } from 'phosphor-react'
 import { AuthError, ConnectBox, ConnectItem } from './styles'

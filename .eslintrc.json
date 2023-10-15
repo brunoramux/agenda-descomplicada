@@ -4,7 +4,8 @@
     "next/core-web-vitals"
   ],
   "rules": {
-    "camelcase": "off"
+    "camelcase": "off",
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }
 

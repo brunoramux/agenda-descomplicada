@@ -39,7 +39,6 @@ export function ClaimUsernameForm() {
     <>
       <Form as="form" onSubmit={handleSubmit(handleClaimUsername)}>
         <TextInput
-          size="sm"
           prefix="agendadescomplicada.com/"
           placeholder="seu-usuário"
           {...register('username')}
