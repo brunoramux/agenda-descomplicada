@@ -7,7 +7,7 @@ services:
     ports:
       - 3306:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=ignitecall
-      - MYSQL_DATABASE=ignitecall
-      - MYSQL_USER=ignitecall
-      - MYSQL_PASSWORD:ignitecall
+      - MYSQL_ROOT_PASSWORD=mysql1234
+      - MYSQL_DATABASE=descomplica_agenda
+      - MYSQL_USER=mysql_user
+      - MYSQL_PASSWORD:mysql1234

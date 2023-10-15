@@ -2,11 +2,10 @@ import {
   Button,
   Checkbox,
   Heading,
-  MultiStep,
   Text,
   TextInput,
 } from '@brunoramos-ui/react'
-import { Container, Header } from '../styles'
+import { Container, Header } from '../../register/styles'
 import {
   FormError,
   IntervalBox,
@@ -22,6 +21,9 @@ import { getWeekDays } from '@/src/utils/get-week-days'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { convertTimeStringToMinutes } from '@/src/utils/convert-time-string-to-minutes'
 import { api } from '@/src/lib/axios'
+import { GetStaticPaths, GetStaticProps } from 'next'
+import { prisma } from '@/src/lib/prisma'
+import { User, UserTimeInterval } from '@prisma/client'
 import { useRouter } from 'next/router'
 
 const timeIntervalsFormSchema = z.object({
@@ -63,10 +65,18 @@ const timeIntervalsFormSchema = z.object({
     ),
 })
 
+interface UpdateTimeIntervalsProps {
+  user: User
+  timeIntervals: UserTimeInterval[]
+}
+
 type TimeIntervalsFormInput = z.input<typeof timeIntervalsFormSchema>
 type TimeIntervalsFormOutput = z.output<typeof timeIntervalsFormSchema>
 
-export default function TimeIntervals() {
+export default function TimeIntervals({
+  user,
+  timeIntervals,
+}: UpdateTimeIntervalsProps) {
   const {
     register,
     handleSubmit,
@@ -77,7 +87,12 @@ export default function TimeIntervals() {
     resolver: zodResolver(timeIntervalsFormSchema),
     defaultValues: {
       intervals: [
-        { weekDay: 0, enabled: false, startTime: '08:00', endTime: '18:00' },
+        {
+          weekDay: 0,
+          enabled: false,
+          startTime: '08:00',
+          endTime: '18:00',
+        },
         { weekDay: 1, enabled: true, startTime: '08:00', endTime: '18:00' },
         { weekDay: 2, enabled: true, startTime: '08:00', endTime: '18:00' },
         { weekDay: 3, enabled: true, startTime: '08:00', endTime: '18:00' },
@@ -96,25 +111,21 @@ export default function TimeIntervals() {
   })
 
   const intervals = watch('intervals') // verifica em tempo real o estado do array intervals dentro do form
-
+  const router = useRouter()
   async function handleSetTimeIntervals(data: any) {
     const { intervals } = data as TimeIntervalsFormOutput
-    await api.post('/users/time-intervals', { intervals })
-
-    await router.push('/register/update-profile')
+    await api.post(`/users/${user.username}/updateTimeIntervals`, { intervals })
+    router.push(`/schedule/${user.username}`)
   }
-
-  const router = useRouter()
 
   return (
     <Container>
       <Header>
-        <Heading as="strong">Quase lá</Heading>
+        <Heading as="strong">Atualize seus horários</Heading>
         <Text>
           Defina o intervalo de horários que você está disponível em cada dia da
           semana.
         </Text>
-        <MultiStep size={4} currentStep={3} />
       </Header>
       <IntervalBox as="form" onSubmit={handleSubmit(handleSetTimeIntervals)}>
         <IntervalsContainer>
@@ -163,10 +174,50 @@ export default function TimeIntervals() {
           <FormError size="sm">{errors.intervals?.message}</FormError>
         )}
         <Button type="submit" disabled={isSubmitting}>
-          Próximo passo
+          Atualizar
           <ArrowRight />
         </Button>
       </IntervalBox>
     </Container>
   )
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking',
+  }
+}
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const username = String(params?.username)
+
+  const user = await prisma.user.findUnique({
+    where: {
+      username,
+    },
+  })
+
+  if (!user) {
+    return {
+      notFound: true,
+    }
+  }
+
+  const timeIntervals = await prisma.userTimeInterval.findMany({
+    where: {
+      user_id: user.id,
+    },
+  })
+
+  return {
+    props: {
+      user: {
+        id: user.id,
+        username,
+      },
+      timeIntervals,
+    },
+    revalidate: 60 * 60 * 24, // 1 dia
+  }
 }

@@ -8,10 +8,10 @@ export default function Home() {
   return (
     <Container>
       <Hero>
-        <Heading size="4xl">Agendamento descomplicado</Heading>
+        <Heading size="4xl">Agenda descomplicada</Heading>
         <Text size="xl">
-          Conecte seu calendário e permita que as pessoas marquem agendamentos
-          no seu tempo livre.
+          Conecte seu calendário do Google e permita que as pessoas marquem
+          agendamentos em seus horários disponíveis.
         </Text>
         <ClaimUsernameForm />
       </Hero>
