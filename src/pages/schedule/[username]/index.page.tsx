@@ -32,6 +32,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
+  // SSR PARA PEGAR DADOS DO USUÁRIO E PREENCHER NA TELA ANTES DA PÁGINA RENDERIZAR
   const username = String(params?.username)
 
   const user = await prisma.user.findUnique({

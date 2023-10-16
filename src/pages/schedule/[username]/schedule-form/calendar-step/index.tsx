@@ -38,6 +38,7 @@ export function CalendarStep({ onSelectDateTime }: CalendarStepProps) {
     : null
 
   const { data: availability } = useQuery<Avalaibility>( // hook do react para chamadas de api. Substitui o useEffect. Possui camada de cache, tornando a aplicacao mais rapida
+    // CONSULTA HORARIOS DISPONIVEIS PARA O DIA SELECIONADO
     ['availability', selectedDateWhitoutTime],
     async () => {
       const response = await api.get(`/users/${username}/availability`, {
@@ -48,7 +49,7 @@ export function CalendarStep({ onSelectDateTime }: CalendarStepProps) {
       return response.data
     },
     {
-      enabled: !!selectedDate,
+      enabled: !!selectedDate, // EXECUTA APENAS QUANDO SELECIONADO UMA DATA
     },
   )
   const unavailableTimes = availability?.unavailableTimes.map(
@@ -58,6 +59,7 @@ export function CalendarStep({ onSelectDateTime }: CalendarStepProps) {
   )
 
   function handleSelectTime(hour: number) {
+    // FORMATA A DATA E HORA PARA PASSAR
     const dateTime = dayjs(selectedDate)
       .set('hour', hour)
       .startOf('hour')
@@ -68,31 +70,36 @@ export function CalendarStep({ onSelectDateTime }: CalendarStepProps) {
   }
 
   return (
-    <Container isTimePickerOpen={isDateSelected}>
-      <Calendar selectedDate={selectedDate} onDateSelected={setSelectedDate} />
+    <>
+      <Container isTimePickerOpen={isDateSelected}>
+        <Calendar
+          selectedDate={selectedDate}
+          onDateSelected={setSelectedDate}
+        />
 
-      {isDateSelected && (
-        <TimePicker>
-          <TimePickerHeader>
-            {weekDay} <span>{describedDate}</span>
-          </TimePickerHeader>
-          <TimePickerList>
-            {availability?.possibleTimes.map((hour) => {
-              // percorre todos os possiveis horarios
-              return (
-                <TimePickerItem
-                  key={hour}
-                  onClick={() => handleSelectTime(hour)}
-                  disabled={!!unavailableTimes?.includes(hour)} // caso horario nao disponivel, deixa o botao desabilitado
-                >
-                  {/* formatando hora para mostrar na tela */}
-                  {String(hour).padStart(2, '0')}:00h{' '}
-                </TimePickerItem>
-              )
-            })}
-          </TimePickerList>
-        </TimePicker>
-      )}
-    </Container>
+        {isDateSelected && (
+          <TimePicker>
+            <TimePickerHeader>
+              {weekDay} <span>{describedDate}</span>
+            </TimePickerHeader>
+            <TimePickerList>
+              {availability?.possibleTimes.map((hour) => {
+                // percorre todos os possiveis horarios
+                return (
+                  <TimePickerItem
+                    key={hour}
+                    onClick={() => handleSelectTime(hour)}
+                    disabled={!!unavailableTimes?.includes(hour)} // caso horario nao disponivel, deixa o botao desabilitado
+                  >
+                    {/* formatando hora para mostrar na tela */}
+                    {String(hour).padStart(2, '0')}:00h{' '}
+                  </TimePickerItem>
+                )
+              })}
+            </TimePickerList>
+          </TimePicker>
+        )}
+      </Container>
+    </>
   )
 }
